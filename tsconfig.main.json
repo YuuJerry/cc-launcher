@@ -9,8 +9,8 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "outDir": "./dist/main"
+    "outDir": "./dist"
   },
-  "include": ["src/main/**/*"],
+  "include": ["src/main/**/*", "src/preload.ts"],
   "exclude": ["node_modules", "dist", "release", "src/renderer"]
 }

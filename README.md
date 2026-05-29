@@ -11,9 +11,6 @@
 - **多 AI 服务商** — 支持 DeepSeek、Kimi (Moonshot)、OpenAI 及自定义 API
 - **配置导入导出** — 一键导出配置分享给他人使用
 
-## 截图
-
-![screenshot](image.png)
 
 ## 开发
 

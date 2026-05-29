@@ -50,7 +50,7 @@ function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', background: '#1a1a2e' }}>
-      {/* 自定义标题栏（可拖拽） */}
+      {/* 自定义标题栏 */}
       <div style={{
         height: 38,
         background: 'linear-gradient(90deg, #16213e, #0f3460)',
@@ -58,15 +58,15 @@ function App() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 16px',
-        WebkitAppRegion: 'drag',    // 整个标题栏可拖拽
         borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* 只有标题文字区域可拖拽 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, WebkitAppRegion: 'drag', flex: 1 }}>
           <span style={{ fontSize: 16 }}>🤖</span>
           <span style={{ fontSize: 14, fontWeight: 600, color: '#e0e0e0' }}>CC Launcher</span>
         </div>
-        {/* 窗口控制按钮区域（不可拖拽，可点击） */}
-        <div style={{ display: 'flex', gap: 8, WebkitAppRegion: 'no-drag' }}>
+        {/* 窗口控制按钮（明确不可拖拽） */}
+        <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={handleWindowMin} style={windowBtnStyle} title="最小化">−</button>
           <button onClick={handleWindowMax} style={windowBtnStyle} title="最大化">□</button>
           <button onClick={handleWindowClose} style={{...windowBtnStyle, color: '#ff6b6b'}} title="关闭">✕</button>

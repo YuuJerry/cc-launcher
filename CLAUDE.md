@@ -15,20 +15,32 @@ npm run pack         # 构建 + electron-builder 打包（目录形式，不生�
 npm run dist:win     # 构建 + 生成 Windows NSIS 安装包到 release/ 目录
 ```
 
+双击 `启动.bat` 可快速构建并启动应用。
+
 ## 架构说明
 
-### 双进程架构
+### 三进程架构
 
-项目有两套独立的 TypeScript 编译配置：
+- **主进程** (`src/main/index.ts`)：窗口创建、IPC 处理、子进程管理
+- **预加载脚本** (`src/preload.ts`)：在主进程和渲染进程之间建立安全的 IPC 桥接
+- **渲染进程** (`src/renderer/`)：React UI
 
-- **主进程** (`src/main/`)：`tsconfig.main.json`，CommonJS 模块，编译到 `dist/main/`
-- **渲染进程** (`src/renderer/`)：`tsconfig.renderer.json`，ESM 模块，由 Vite 构建到 `dist/renderer/`
+### 编译配置
+
+- **主进程 + preload**：`tsconfig.main.json`，CommonJS 模块，编译到 `dist/`
+  - `src/main/index.ts` → `dist/main/index.js`
+  - `src/preload.ts` → `dist/preload.js`
+- **渲染进程**：`tsconfig.renderer.json`，ESM 模块，由 Vite 构建到 `dist/renderer/`
 
 ### 进程间通信
 
-渲染进程通过 `src/renderer/src/electron-api.ts` 桥接模块访问主进程功能。该模块将 `ipcRenderer.invoke`/`ipcRenderer.send` 包装到 `window.electronAPI` 对象上。
+通过 `src/preload.ts` 使用 `contextBridge.exposeInMainWorld` 将 `ipcRenderer` 接口安全暴露到 `window.electronAPI`。
 
-主进程 `src/main/index.ts` 中通过 `ipcMain.handle`（双向）和 `ipcMain.on`（单向）处理请求。当前 IPC 通道：
+主进程使用 `contextIsolation: true` + `nodeIntegration: false`（安全模式），preload 脚本在 `webPreferences.preload` 中指定。
+
+`src/renderer/src/electron-api.ts` 和 `src/renderer/src/global.d.ts` 仅为渲染进程提供 `window.electronAPI` 的 TypeScript 类型声明，不含运行时代码。
+
+当前 IPC 通道：
 - `cc-connect:start/stop/status` — CC Connect 子进程管理
 - `claudecode:start/stop` — Claude Code 子进程管理
 - `model:switch` — 写入 `.env` 文件切换模型
@@ -36,16 +48,7 @@ npm run dist:win     # 构建 + 生成 Windows NSIS 安装包到 release/ 目录
 - `config:export` — 导出配置 JSON
 - `window-minimize/maximize/close` — 窗口控制
 
-### 渲染进程结构
-
-- `App.tsx` — 无边框窗口根组件，自定义标题栏（drag 区域）+ 三标签页切换
-- `components/LauncherTab.tsx` — 服务启停 + 模型切换
-- `components/PromptTab.tsx` — 提示词优化（通用/生图双模式）
-- `components/SettingsTab.tsx` — 命令路径配置 + 配置导入导出
-- `types/index.ts` — AI 服务商预设配置（DeepSeek / Kimi / OpenAI / 自定义）
-
 ### 关键构建配置
 
 - `vite.config.ts` 中 `base: './'` 是必需的，否则 Electron 通过 file:// 协议加载时资源路径会失效
-- 主进程使用 `nodeIntegration: true` + `contextIsolation: false`，渲染进程可直接 `require('electron')`
-- electron-builder 打包输出到 `release/`，已配置 Windows NSIS 安装包（支持自定义安装目录）
+- `vite.config.ts` 中 `build.rollupOptions.external: ['electron']` 是必需的，防止 Vite 将 `require('electron')` 打包时丢弃

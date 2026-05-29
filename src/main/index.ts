@@ -28,8 +28,9 @@ function createWindow() {
     transparent: false,
     backgroundColor: '#1a1a2e',  // 深色背景
     webPreferences: {
-      nodeIntegration: true,      // 允许渲染进程使用 Node.js API
-      contextIsolation: false,    // 关闭上下文隔离（配合 nodeIntegration 使用）
+      contextIsolation: true,     // 开启上下文隔离（安全模式）
+      nodeIntegration: false,     // 禁用渲染进程 Node.js 访问
+      preload: path.join(__dirname, '../preload.js'),  // 加载预加载脚本
     },
   });
 
@@ -75,7 +76,7 @@ ipcMain.on('window-close', () => mainWindow?.close());
 // --- CC Connect 启停控制 ---
 /**
  * 启动 CC Connect 进程
- * 命令：cc-connect run --project wx-claude
+ * 命令：cc-connect run（直接运行，不指定 --project）
  * @param workDir - 工作目录
  */
 ipcMain.handle('cc-connect:start', async (_event, workDir: string) => {
@@ -84,7 +85,7 @@ ipcMain.handle('cc-connect:start', async (_event, workDir: string) => {
       return { success: false, message: 'CC Connect 已在运行' };
     }
     const ccConnectPath = 'cc-connect';
-    ccConnectProcess = spawn(ccConnectPath, ['run', '--project', 'wx-claude'], {
+    ccConnectProcess = spawn(ccConnectPath, ['run'], {
       cwd: workDir,
       shell: true,
       detached: false,

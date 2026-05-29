@@ -158,7 +158,15 @@ function LauncherTab() {
             </div>
           </div>
           {/* 启动/停止按钮 */}
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {/* 运行中状态标签 */}
+            {state.ccRunning && !state.ccLoading && (
+              <span style={{
+                fontSize: 12, color: '#22c55e', fontWeight: 600,
+                background: 'rgba(34,197,94,0.12)', padding: '4px 10px',
+                borderRadius: 6, whiteSpace: 'nowrap',
+              }}>● 已运行</span>
+            )}
             {!state.ccRunning && (
               <button onClick={handleCCStart} disabled={state.ccLoading} style={btnPrimary}>
                 {state.ccLoading ? '启动中...' : '启动'}
@@ -213,7 +221,15 @@ function LauncherTab() {
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {/* 运行中状态标签 */}
+            {state.claudeRunning && !state.claudeLoading && (
+              <span style={{
+                fontSize: 12, color: '#22c55e', fontWeight: 600,
+                background: 'rgba(34,197,94,0.12)', padding: '4px 10px',
+                borderRadius: 6, whiteSpace: 'nowrap',
+              }}>● 已运行</span>
+            )}
             {!state.claudeRunning && (
               <button onClick={handleClaudeStart} disabled={state.claudeLoading} style={btnPrimary}>
                 {state.claudeLoading ? '启动中...' : '启动'}
