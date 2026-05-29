@@ -1,0 +1,22 @@
+# 依赖
+node_modules/
+
+# 构建输出
+dist/
+release/
+
+# 日志
+*.log
+npm-debug.log*
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# 环境变量（可能包含 API Key）
+.env
+.env.*
